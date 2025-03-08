@@ -49,6 +49,21 @@ namespace Tennis.Tests
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
+    public class TestDataGeneratorScoreNames : IEnumerable<object[]>
+    {
+        private readonly List<object[]> _data = new List<object[]>
+        {
+            new object[] {0, TennisScoreName.Love},
+            new object[] {1, TennisScoreName.Fifteen},
+            new object[] {2, TennisScoreName.Thirty},
+            new object[] {3, TennisScoreName.Forty },
+        };
+
+        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
     public class TennisTests
     {
         [Theory]
@@ -94,7 +109,7 @@ namespace Tennis.Tests
         {
             var game = new TennisGame6("player1", "player2");
             CheckAllScores(game, p1, p2, expected);
-        }        
+        }
         [Theory]
         [ClassData(typeof(TestDataGenerator))]
         public void Tennis7Test(int p1, int p2, string expected)
@@ -102,6 +117,30 @@ namespace Tennis.Tests
             var game = new TennisGame7("player1", "player2");
             CheckAllScores(game, p1, p2, "Current score: " + expected + ", enjoy your game!");
         }
+
+        [Theory]
+        [ClassData(typeof(TestDataGeneratorScoreNames))]
+        public void Tennis2RegularScoreTest(int points, TennisScoreName expectedScore)
+        {
+            CheckRegularScoreNames(points, expectedScore);
+        }
+
+        [Fact]
+        public void Player_Constructor_ShouldSetName()
+        {
+            var player = new Player("Roger Federer");
+            Assert.Equal("Roger Federer", player.Name);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(null)]
+        public void Player_ShouldThrowException_WhenNameIsInvalid(string invalidName)
+        {
+            Assert.Throws<ArgumentException>(() => new Player(invalidName));
+        }
+
         private void CheckAllScores(ITennisGame game, int player1Score, int player2Score, string expectedScore)
         {
             var highestScore = Math.Max(player1Score, player2Score);
@@ -114,6 +153,31 @@ namespace Tennis.Tests
             }
 
             Assert.Equal(expectedScore, game.GetScore());
+        }
+
+        private void CheckRegularScoreNames(int points, TennisScoreName expectedScore)
+        {
+            var player1 = new Player("player1");
+            for (int i = 0; i < points; i++)
+                player1.WinPoint();
+
+            if (points < 3)
+                Assert.Equal(expectedScore, player1.RegularScoreName());
+        }
+
+        [Theory]
+        [InlineData(4)]
+        [InlineData(15)]
+        public void RegularScoreName_ShouldThrowException_WhenScoreIsInvalid(int score)
+        {
+            var player = new Player("player2");
+
+            for (int i = 0; i < score; i++)
+            {
+                player.WinPoint();
+            }
+
+            Assert.Throws<InvalidOperationException>(() => player.RegularScoreName());
         }
     }
 }
