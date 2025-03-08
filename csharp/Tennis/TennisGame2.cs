@@ -7,16 +7,13 @@ namespace Tennis
         private const int MaxStandardScore = 3;
         private const int WinningPointDifference = 2;
 
-        private int _player1Points = 0;
-        private int _player2Point = 0;
-
-        private readonly string _player1Name;
-        private readonly string _player2Name;
+        private readonly Player _player1;
+        private readonly Player _player2;
 
         public TennisGame2(string player1Name, string player2Name)
         {
-            this._player1Name = player1Name;
-            this._player2Name = player2Name;
+            _player1 = new Player(player1Name);
+            _player2 = new Player(player2Name);
         }
 
         public string GetScore()
@@ -26,9 +23,9 @@ namespace Tennis
             if (IsDeuce())
                 score = "Deuce";
             else if (IsTie())
-                score = $"{ScoreName(_player1Points)}-All";
+                score = $"{ScoreName(_player1.Score)}-All";
             else if (IsRegularPoint())
-                score = ScoreName(_player1Points) + "-" + ScoreName(_player2Point);
+                score = ScoreName(_player1.Score) + "-" + ScoreName(_player2.Score);
             else if (HasWinner())
                 score = $"Win for {GetLeadingPlayerName()}";
             else
@@ -40,9 +37,9 @@ namespace Tennis
         public void WonPoint(string player)
         {
             if (player == "player1")
-                _player1Points++;
+                _player1.WinPoint();
             else
-                _player2Point++;
+                _player2.WinPoint();
         }
         private string ScoreName(int points)
         {
@@ -55,16 +52,33 @@ namespace Tennis
                 _ => "Invalid Score"
             };
         }
-        private bool IsDeuce() => IsTie() && _player1Points >= MaxStandardScore;
-        private bool IsTie() => _player1Points == _player2Point;
-        private bool IsRegularPoint() => _player1Points <= MaxStandardScore && _player2Point <= MaxStandardScore;
+        private bool IsDeuce() => IsTie() && _player1.Score >= MaxStandardScore;
+        private bool IsTie() => _player1.Score == _player2.Score;
+        private bool IsRegularPoint() => _player1.Score <= MaxStandardScore && _player2.Score <= MaxStandardScore;
         private bool HasWinner()
         {
-            return (_player1Points > MaxStandardScore || _player2Point > MaxStandardScore) &&
-                Math.Abs(_player1Points - _player2Point) >= WinningPointDifference;
+            return (_player1.Score > MaxStandardScore || _player2.Score > MaxStandardScore) &&
+                Math.Abs(_player1.Score - _player2.Score) >= WinningPointDifference;
         }
-        private string GetLeadingPlayerName() => _player1Points > _player2Point ? _player1Name : _player2Name;
+        private string GetLeadingPlayerName() => _player1.Score > _player2.Score ? _player1.Name : _player2.Name;
 
+    }
+
+    public class Player
+    {
+        public string Name { get; }
+        public int Score { get; private set; }
+
+        public Player(string name)
+        {
+            Name = name;
+            Score = 0;
+        }
+
+        public void WinPoint()
+        {
+            Score++;
+        }
     }
 }
 
