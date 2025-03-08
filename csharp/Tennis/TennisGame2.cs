@@ -2,6 +2,7 @@ using System;
 
 namespace Tennis
 {
+    using static Tennis.TennisScoreName;
     public class TennisGame2 : ITennisGame
     {
         private const int MaxStandardScore = 3;
@@ -54,33 +55,45 @@ namespace Tennis
 
     }
 
-    public class Player
+    public sealed class Player
     {
         public string Name { get; }
-        public int Score { get; private set; }
+        private int _score;
 
         public Player(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Player name cannot be empty.", nameof(name));
+
             Name = name;
-            Score = 0;
+            _score = 0;
         }
+        public int Score => _score;
 
         public void WinPoint()
         {
-            Score++;
+            _score++;
         }
-        public string RegularScoreName()
+        public TennisScoreName RegularScoreName()
         {
-            return Score switch
+            return _score switch
             {
-                0 => "Love",
-                1 => "Fifteen",
-                2 => "Thirty",
-                3 => "Forty",
-                _ => throw new InvalidOperationException($"Invalid score: {Score}")
+                0 => Love,
+                1 => Fifteen,
+                2 => Thirty,
+                3 => Forty,
+                _ => throw new InvalidOperationException($"Invalid score: {_score}")
             };
         }
+        public override string ToString() => $"{Name} (Score: {Score})";
 
     }
-}
+    public enum TennisScoreName
+    {
+        Love,
+        Fifteen,
+        Thirty,
+        Forty
+    }
 
+}
