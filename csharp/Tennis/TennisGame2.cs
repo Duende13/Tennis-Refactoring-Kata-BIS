@@ -7,16 +7,16 @@ namespace Tennis
         private const int MaxStandardScore = 3;
         private const int WinningPointDifference = 2;
 
-        private int p1point = 0;
-        private int p2point = 0;
+        private int _player1Points = 0;
+        private int _player2Point = 0;
 
-        private string player1Name;
-        private string player2Name;
+        private readonly string _player1Name;
+        private readonly string _player2Name;
 
         public TennisGame2(string player1Name, string player2Name)
         {
-            this.player1Name = player1Name;
-            this.player2Name = player2Name;
+            this._player1Name = player1Name;
+            this._player2Name = player2Name;
         }
 
         public string GetScore()
@@ -26,9 +26,9 @@ namespace Tennis
             if (IsDeuce())
                 score = "Deuce";
             else if (IsTie())
-                score = $"{ScoreName(p1point)}-All";
+                score = $"{ScoreName(_player1Points)}-All";
             else if (IsRegularPoint())
-                score = ScoreName(p1point) + "-" + ScoreName(p2point);
+                score = ScoreName(_player1Points) + "-" + ScoreName(_player2Point);
             else if (HasWinner())
                 score = $"Win for {GetLeadingPlayerName()}";
             else
@@ -37,38 +37,12 @@ namespace Tennis
             return score;
         }
 
-        public void SetP1Score(int number)
-        {
-            for (int i = 0; i < number; i++)
-            {
-                P1Score();
-            }
-        }
-
-        public void SetP2Score(int number)
-        {
-            for (var i = 0; i < number; i++)
-            {
-                P2Score();
-            }
-        }
-
-        private void P1Score()
-        {
-            p1point++;
-        }
-
-        private void P2Score()
-        {
-            p2point++;
-        }
-
         public void WonPoint(string player)
         {
             if (player == "player1")
-                P1Score();
+                _player1Points++;
             else
-                P2Score();
+                _player2Point++;
         }
         private string ScoreName(int points)
         {
@@ -81,15 +55,15 @@ namespace Tennis
                 _ => "Invalid Score"
             };
         }
-        private bool IsDeuce() => IsTie() && p1point >= MaxStandardScore;
-        private bool IsTie() => p1point == p2point;
-        private bool IsRegularPoint() => p1point <= MaxStandardScore && p2point <= MaxStandardScore;
+        private bool IsDeuce() => IsTie() && _player1Points >= MaxStandardScore;
+        private bool IsTie() => _player1Points == _player2Point;
+        private bool IsRegularPoint() => _player1Points <= MaxStandardScore && _player2Point <= MaxStandardScore;
         private bool HasWinner()
         {
-            return (p1point > MaxStandardScore || p2point > MaxStandardScore) &&
-                Math.Abs(p1point - p2point) >= WinningPointDifference;
+            return (_player1Points > MaxStandardScore || _player2Point > MaxStandardScore) &&
+                Math.Abs(_player1Points - _player2Point) >= WinningPointDifference;
         }
-        private string GetLeadingPlayerName() => p1point > p2point ? player1Name : player2Name;
+        private string GetLeadingPlayerName() => _player1Points > _player2Point ? _player1Name : _player2Name;
 
     }
 }
