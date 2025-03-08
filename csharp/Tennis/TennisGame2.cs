@@ -23,9 +23,9 @@ namespace Tennis
             if (IsDeuce())
                 score = "Deuce";
             else if (IsTie())
-                score = $"{ScoreName(_player1.Score)}-All";
+                score = $"{_player1.RegularScoreName()}-All";
             else if (IsRegularPoint())
-                score = ScoreName(_player1.Score) + "-" + ScoreName(_player2.Score);
+                score = _player1.RegularScoreName() + "-" + _player2.RegularScoreName();
             else if (HasWinner())
                 score = $"Win for {GetLeadingPlayerName()}";
             else
@@ -41,17 +41,7 @@ namespace Tennis
             else
                 _player2.WinPoint();
         }
-        private string ScoreName(int points)
-        {
-            return points switch
-            {
-                0 => "Love",
-                1 => "Fifteen",
-                2 => "Thirty",
-                3 => "Forty",
-                _ => "Invalid Score"
-            };
-        }
+
         private bool IsDeuce() => IsTie() && _player1.Score >= MaxStandardScore;
         private bool IsTie() => _player1.Score == _player2.Score;
         private bool IsRegularPoint() => _player1.Score <= MaxStandardScore && _player2.Score <= MaxStandardScore;
@@ -79,6 +69,18 @@ namespace Tennis
         {
             Score++;
         }
+        public string RegularScoreName()
+        {
+            return Score switch
+            {
+                0 => "Love",
+                1 => "Fifteen",
+                2 => "Thirty",
+                3 => "Forty",
+                _ => throw new InvalidOperationException($"Invalid score: {Score}")
+            };
+        }
+
     }
 }
 
